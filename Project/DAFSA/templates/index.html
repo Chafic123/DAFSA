@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAFSA Web Application</title>
+    <link rel="stylesheet" href="../static/style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <div class="operation-panel">
+        <div class="word-input-section">
+            <input id="addWordInput" type="text" placeholder="Enter word">
+            <button onclick="addWord()">Add Word</button>
+            <div class="graph-display-container" id="addWordGraphDisplay"></div>
+        </div>
+
+        <div class="word-check-section">
+            <input id="checkWordInput" type="text" placeholder="Enter word">
+            <button onclick="checkWord()">Check Word</button>
+            <div id="resultIcon" class="result-icon"></div>
+        </div>
+    </div>
+
+    <div class="graphs-panel">
+        <div class="graph-section">
+            <h3>Original Graph</h3>
+            <div class="graph-display-container">
+                <svg id="originalGraph" width="600" height="400"></svg>
+            </div>
+        </div>
+        <div class="graph-section">
+            <h3>Minimized Graph</h3>
+            <div class="graph-display-container">
+                <svg id="minimizedGraph" width="600" height="400"></svg>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <p id="modalMessage"></p>
+        </div>
+    </div>
+
+    <!-- Sound Effect -->
+    <audio id="success-sound" src="success.mp3" preload="auto"></audio>
+
+    <script src="../static/scripts.js"></script>
+</body>
+</html>
