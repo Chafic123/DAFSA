@@ -1,3 +1,5 @@
+# app.py
+
 from flask import Flask, render_template, request, jsonify
 from dafsa import DAFSA
 
@@ -32,9 +34,8 @@ def get_minimized_graph_data():
 
 @app.route('/minimize', methods=['POST'])
 def minimize():
-    global minimized_dafsa
-    minimized_dafsa = DAFSA()
-    minimized_dafsa.root = dafsa.root
+    global dafsa, minimized_dafsa
+    minimized_dafsa = dafsa.clone()
     minimized_dafsa.minimize()
     return jsonify({'message': 'DAFSA minimized.'})
 
@@ -42,9 +43,18 @@ def minimize():
 def search_word():
     word = request.json.get('word')
     if word:
-        exists = dafsa.search(word)
-        return jsonify({'exists': exists})
+        node = dafsa.search(word)
+        if node:
+            return jsonify({'exists': True, 'nodeId': node.id})
+        return jsonify({'exists': False})
     return jsonify({'error': 'Word is required.'}), 400
+
+@app.route('/reset', methods=['POST'])
+def reset():
+    global dafsa, minimized_dafsa
+    dafsa = DAFSA()
+    minimized_dafsa = None
+    return jsonify({'message': 'DAFSA has been reset.'})
 
 if __name__ == '__main__':
     app.run(debug=True)

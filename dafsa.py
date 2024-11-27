@@ -1,31 +1,34 @@
+# dafsa.py
+
 class Node:
-    id_counter = 0
+    _id_counter = 1  # Start from 1
 
     def __init__(self, is_final=False):
+        self.transitions = {}
         self.is_final = is_final
-        self.transitions = {}  
-        Node.id_counter += 1
-        self.id = f"Q{Node.id_counter}"
+        self.id = f'Q{Node._id_counter}'  # Assign labels like 'Q1', 'Q2', etc.
+        Node._id_counter += 1
 
     def __eq__(self, other):
-        if self.is_final != other.is_final:
-            return False
-        if len(self.transitions) != len(other.transitions):
-            return False
-        for char in self.transitions:
-            if char not in other.transitions:
-                return False
-            if self.transitions[char] != other.transitions[char]:
-                return False
-        return True
+        return self.is_final == other.is_final and self.transitions == other.transitions
 
     def __hash__(self):
-        transitions_hash = tuple(sorted((char, id(child)) for char, child in self.transitions.items()))
-        return hash((self.is_final, transitions_hash))
+        # Hash based on is_final and transitions' sorted items
+        return hash((self.is_final, frozenset(self.transitions.items())))
+
+def clone_node(node, clones):
+    if node in clones:
+        return clones[node]
+    new_node = Node(is_final=node.is_final)
+    new_node.id = node.id  # Preserve the node's label
+    clones[node] = new_node
+    for char, child in node.transitions.items():
+        new_node.transitions[char] = clone_node(child, clones)
+    return new_node
 
 class DAFSA:
     def __init__(self):
-        Node.id_counter = 0  
+        # Removed resetting Node._id_counter to ensure unique IDs
         self.root = Node()
         self.register = {}
 
@@ -45,7 +48,7 @@ class DAFSA:
         for char in list(node.transitions.keys()):
             child = self._minimize(node.transitions[char])
             node.transitions[char] = child
-        key = (node.is_final, tuple(sorted(node.transitions.items())))
+        key = (node.is_final, frozenset(node.transitions.items()))
         if key in self.register:
             return self.register[key]
         else:
@@ -56,21 +59,23 @@ class DAFSA:
         nodes = []
         edges = []
         visited = set()
-        queue = [self.root]
+        queue = [(self.root, "")]  # (node, prefix)
 
         while queue:
-            current_node = queue.pop(0)
+            current_node, prefix = queue.pop(0)
             if current_node.id in visited:
                 continue
             visited.add(current_node.id)
+            label = prefix if current_node != self.root else "Start"
             nodes.append({
                 'data': {
-                    'id': current_node.id,
-                    'label': current_node.id,
-                    'is_final': current_node.is_final
+                    'id': current_node.id,  # 'Q1', 'Q2', etc.
+                    'label': label,
+                    'is_final': 'true' if current_node.is_final else 'false'  # Send as string
                 }
             })
             for char, child in current_node.transitions.items():
+                child_prefix = prefix + char
                 edges.append({
                     'data': {
                         'source': current_node.id,
@@ -78,7 +83,7 @@ class DAFSA:
                         'label': char
                     }
                 })
-                queue.append(child)
+                queue.append((child, child_prefix))
 
         return {'nodes': nodes, 'edges': edges}
 
@@ -88,5 +93,11 @@ class DAFSA:
             if char in node.transitions:
                 node = node.transitions[char]
             else:
-                return False
-        return node.is_final
+                return None
+        return node if node.is_final else None
+
+    def clone(self):
+        clones = {}
+        new_dafsa = DAFSA()
+        new_dafsa.root = clone_node(self.root, clones)
+        return new_dafsa
