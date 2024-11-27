@@ -1,0 +1,14 @@
+{
+  "name": "dafsa_app",
+  "version": "1.0.0",
+  "description": "DAFSA application using Flask and Tailwind CSS",
+  "main": "app.py",
+  "scripts": {
+    "build-css": "tailwindcss -i ./static/tailwind.css -o ./static/output.css --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "tailwindcss": "^3.2.0"
+  }
+}
