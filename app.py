@@ -25,7 +25,6 @@ def remove_word():
     if word:
         success = dafsa.remove(word)
         if success:
-            dafsa.minimize()
             return jsonify({'message': f"'{word}' removed from DAFSA."})
         else:
             return jsonify({'error': f"'{word}' not found in DAFSA."}), 404

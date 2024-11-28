@@ -1,5 +1,3 @@
-# dafsa.py
-
 class Node:
     _id_counter = 1  
 
