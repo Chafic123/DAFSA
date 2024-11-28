@@ -19,6 +19,18 @@ def add_word():
         return jsonify({'message': f"'{word}' added to DAFSA."})
     return jsonify({'error': 'Word is required.'}), 400
 
+@app.route('/remove_word', methods=['POST'])
+def remove_word():
+    word = request.json.get('word')
+    if word:
+        success = dafsa.remove(word)
+        if success:
+            dafsa.minimize()
+            return jsonify({'message': f"'{word}' removed from DAFSA."})
+        else:
+            return jsonify({'error': f"'{word}' not found in DAFSA."}), 404
+    return jsonify({'error': 'Word is required.'}), 400
+
 @app.route('/get_graph_data')
 def get_graph_data():
     data = dafsa.get_graph_data()

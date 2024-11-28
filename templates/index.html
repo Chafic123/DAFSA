@@ -10,29 +10,22 @@
     <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
 </head>
 <body class="bg-gradient-to-br from-purple-500 to-indigo-600 min-h-screen text-white">
-    <div id="success-message" class="flash-message fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-500 ease-in-out opacity-0 pointer-events-none">
-        Success message 
+\    <div id="success-message" class="flash-message fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-500 ease-in-out opacity-0 pointer-events-none">
     </div>
     <div id="error-message" class="flash-message fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-500 ease-in-out opacity-0 pointer-events-none">
-        Error message 
     </div>
 
-    <nav class="bg-transparent py-6">
-        <div class="container mx-auto px-6 md:px-12 flex items-center justify-between">
-            <h1 class="text-4xl font-bold">DAFSA Visualizer</h1>
-        </div>
-    </nav>
 
     <main class="container mx-auto px-6 md:px-12 py-12">
         <div class="text-center mb-12">
             <h2 class="text-5xl font-bold mb-4 animate-fade-in">Dynamic and Minimizable DAFSA</h2>
-            <p class="text-xl">Add words, minimize your DAFSA, and visualize the differences in real-time.</p>
+            <p class="text-xl">Add strings, minimize your DAFSA, and visualize the differences in real-time.</p>
         </div>
         <div class="flex flex-col items-center mb-12">
             <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
-                <input id="wordInput" type="text" class="bg-white bg-opacity-20 border border-transparent p-3 rounded w-full sm:w-64 text-white placeholder-white focus:outline-none focus:ring-4 focus:ring-pink-500 transition duration-300" placeholder="Enter a word">
+                <input id="wordInput" type="text" class="bg-white bg-opacity-20 border border-transparent p-3 rounded-lg w-full sm:w-64 text-white placeholder-white focus:outline-none focus:ring-4 focus:ring-pink-500 transition duration-300" placeholder="Enter a string">
                 <button onclick="addWord()" class="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-gradient-to-br focus:outline-none focus:ring-4 focus:ring-pink-500 transition-all duration-300">
-                    Add Word
+                    Add String
                 </button>
                 <button onclick="minimize()" class="bg-gradient-to-r from-green-400 to-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-gradient-to-br focus:outline-none focus:ring-4 focus:ring-green-500 transition-all duration-300">
                     Minimize DAFSA
@@ -42,9 +35,13 @@
                 </button>
             </div>
             <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                <input id="searchInput" type="text" class="bg-white bg-opacity-20 border border-transparent p-3 rounded w-full sm:w-64 text-white placeholder-white focus:outline-none focus:ring-4 focus:ring-pink-500 transition duration-300" placeholder="Search for a word">
+                <input id="searchInput" type="text" class="bg-white bg-opacity-20 border border-transparent p-3 rounded-lg w-full sm:w-64 text-white placeholder-white focus:outline-none focus:ring-4 focus:ring-pink-500 transition duration-300" placeholder="Search for a string">
                 <button onclick="searchWord()" class="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-gradient-to-br focus:outline-none focus:ring-4 focus:ring-yellow-500 transition-all duration-300">
                     Search
+                </button>
+                <input id="removeInput" type="text" class="bg-white bg-opacity-20 border border-transparent p-3 rounded-lg w-full sm:w-64 text-white placeholder-white focus:outline-none focus:ring-4 focus:ring-red-500 transition duration-300" placeholder="Remove a string">
+                <button onclick="removeWord()" class="bg-gradient-to-r from-red-400 to-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-gradient-to-br focus:outline-none focus:ring-4 focus:ring-red-500 transition-all duration-300">
+                    Remove String
                 </button>
                 <button onclick="resetLayout()" class="bg-gradient-to-r from-blue-400 to-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-gradient-to-br focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300">
                     Reset Layout

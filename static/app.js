@@ -5,38 +5,55 @@ function showFlashMessage(type, message) {
     const errorMessage = document.getElementById('error-message');
 
     if (type === 'success') {
-        successMessage.textContent = message;
+        successMessage.innerHTML = `
+            ${message}
+        `;
         successMessage.classList.remove('opacity-0', 'pointer-events-none');
         successMessage.classList.add('opacity-100');
 
         setTimeout(() => {
-            successMessage.classList.remove('opacity-100');
-            successMessage.classList.add('opacity-0', 'pointer-events-none');
+            hideFlashMessage('success');
         }, 3000);
     } else if (type === 'error') {
-        errorMessage.textContent = message;
+        errorMessage.innerHTML = `
+            ${message}
+        `;
         errorMessage.classList.remove('opacity-0', 'pointer-events-none');
         errorMessage.classList.add('opacity-100');
 
         setTimeout(() => {
-            errorMessage.classList.remove('opacity-100');
-            errorMessage.classList.add('opacity-0', 'pointer-events-none');
+            hideFlashMessage('error');
         }, 3000);
     }
 }
 
+function hideFlashMessage(type) {
+    const successMessage = document.getElementById('success-message');
+    const errorMessage = document.getElementById('error-message');
+
+    if (type === 'success') {
+        successMessage.classList.remove('opacity-100');
+        successMessage.classList.add('opacity-0', 'pointer-events-none');
+        successMessage.innerHTML = '';
+    } else if (type === 'error') {
+        errorMessage.classList.remove('opacity-100');
+        errorMessage.classList.add('opacity-0', 'pointer-events-none');
+        errorMessage.innerHTML = '';
+    }
+}
+
 function addWord() {
-    const word = document.getElementById("wordInput").value.trim();
- 
-    if (!word) {
-        showFlashMessage('error', "Please enter a word.");
+    const string = document.getElementById("wordInput").value.trim();
+
+    if (!string) {
+        showFlashMessage('error', "Please enter a string.");
         return;
     }
 
     fetch("/add_word", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ word }),
+        body: JSON.stringify({ word: string }),
     })
     .then(response => response.json())
     .then(data => {
@@ -49,7 +66,40 @@ function addWord() {
         }
     })
     .catch(error => {
-        showFlashMessage('error', "Error adding word: " + error.message);
+        showFlashMessage('error', "Error adding string: " + error.message);
+    });
+}
+
+function removeWord() {
+    const string = document.getElementById("removeInput").value.trim();
+
+    if (!string) {
+        showFlashMessage('error', "Please enter a string to remove.");
+        return;
+    }
+
+    const confirmRemoval = confirm(`Are you sure you want to remove the string "${string}" from the DAFSA?`);
+    if (!confirmRemoval) {
+        return;
+    }
+
+    fetch("/remove_word", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ word: string }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            showFlashMessage('error', data.error);
+        } else {
+            showFlashMessage('success', data.message);
+            document.getElementById("removeInput").value = "";
+            updateGraphs();
+        }
+    })
+    .catch(error => {
+        showFlashMessage('error', "Error removing string: " + error.message);
     });
 }
 
@@ -91,69 +141,62 @@ function resetLayout() {
             name: "dagre",
             rankDir: "TB",
             nodeDimensionsIncludeLabels: true,
-            rankSep: 70,
-            edgeSep: 50,
+            rankSep: 100, 
+            edgeSep: 80,  
             ranker: "network-simplex",
-            fit: true,
+            animate: true,
+            animationDuration: 1000,
         }).run();
     }
 }
 
 function searchWord() {
-    const word = document.getElementById("searchInput").value.trim();
+    const string = document.getElementById("searchInput").value.trim();
 
-    if (!word) {
-        showFlashMessage('error', "Please enter a word to search.");
+    if (!string) {
+        showFlashMessage('error', "Please enter a string to search.");
         return;
     }
 
     fetch("/search_word", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ word }),
+        body: JSON.stringify({ word: string }),
     })
     .then(response => response.json())
     .then(data => {
         if (data.error) {
             showFlashMessage('error', data.error);
         } else if (data.exists) {
-            showFlashMessage('success', "Word found in DAFSA.");
+            showFlashMessage('success', "String found in DAFSA.");
             highlightNode(data.nodeId);
         } else {
-            showFlashMessage('error', "Word not found in DAFSA.");
+            showFlashMessage('error', "String not found in DAFSA.");
         }
     })
     .catch(error => {
-        showFlashMessage('error', "Error searching for word: " + error.message);
+        showFlashMessage('error', "Error searching for string: " + error.message);
     });
 }
 
 function highlightNode(nodeId) {
-    console.log(`Highlighting node: ${nodeId}`);
     let found = false;
 
     for (const containerId in cyInstances) {
         const cy = cyInstances[containerId];
         const node = cy.getElementById(nodeId);
-        console.log(`Searching for node with ID: ${nodeId}`);
         if (node && node.length > 0) {
-            console.log(`Node found: ${nodeId} with label: ${node.data('label')}`);
-            cy.elements().unselect();
-            node.select();
+            cy.elements().removeClass('highlighted'); 
             node.addClass('highlighted');
-            setTimeout(() => {
-                node.removeClass('highlighted');
-            }, 2000);
             cy.animate({
                 center: { eles: node },
-                zoom: 1.2
+                zoom: 1.5
             }, { duration: 1000 });
             found = true;
         }
     }
 
     if (!found) {
-        console.log(`Node with id ${nodeId} not found.`);
         showFlashMessage('error', "Node not found.");
     }
 }
@@ -165,7 +208,6 @@ function updateGraphs() {
         renderGraph(data, "originalGraph");
     })
     .catch(error => {
-        console.log("Error fetching original graph data:", error);
         showFlashMessage('error', "Error fetching original graph data.");
     });
 
@@ -175,16 +217,12 @@ function updateGraphs() {
         renderGraph(data, "minimizedGraph");
     })
     .catch(error => {
-        console.log("Error fetching minimized graph data:", error);
         showFlashMessage('error', "Error fetching minimized graph data.");
     });
 }
 
 function renderGraph(graphData, containerId) {
     const elements = graphData.nodes.concat(graphData.edges);
-    console.log(`Rendering graph in container: ${containerId}`);
-    console.log(`Nodes:`, graphData.nodes);
-    console.log(`Edges:`, graphData.edges);
 
     if (cyInstances[containerId]) {
         cyInstances[containerId].destroy();
@@ -199,12 +237,12 @@ function renderGraph(graphData, containerId) {
                 style: {
                     label: 'data(label)',
                     'background-color': '#8B5CF6',
-                    width: '40px',
-                    height: '40px',
+                    width: '50px',
+                    height: '50px',
                     'text-valign': 'center',
                     'text-halign': 'center',
                     color: '#fff',
-                    'font-size': '12px',
+                    'font-size': '14px',
                     'border-width': 2,
                     'border-color': '#C4B5FD',
                     shape: 'ellipse',
@@ -213,17 +251,9 @@ function renderGraph(graphData, containerId) {
             {
                 selector: 'node[is_final = "true"]',
                 style: {
-                    'background-color': '#EC4899', 
+                    'background-color': '#EC4899',
                     'border-color': '#F472B6',
                     'border-width': 4,
-                },
-            },
-            {
-                selector: 'node[is_final = "false"]',
-                style: {
-                    'background-color': '#8B5CF6',
-                    'border-color': '#C4B5FD',
-                    'border-width': 2,
                 },
             },
             {
@@ -232,18 +262,19 @@ function renderGraph(graphData, containerId) {
                     label: 'data(label)',
                     'curve-style': 'bezier',
                     'target-arrow-shape': 'triangle',
-                    width: 2,
-                    'line-color': '#D1D5DB',
                     'target-arrow-color': '#D1D5DB',
-                    'font-size': '10px',
+                    'line-color': '#D1D5DB',
+                    width: 3,
+                    'font-size': '12px',
                     color: '#E5E7EB',
                 },
             },
             {
                 selector: '.highlighted',
                 style: {
+                    'background-color': '#FF0000',
                     'border-color': '#FF0000',
-                    'border-width': 8,
+                    'border-width': 6,
                 },
             },
         ],
@@ -251,10 +282,11 @@ function renderGraph(graphData, containerId) {
             name: 'dagre',
             rankDir: 'TB',
             nodeDimensionsIncludeLabels: true,
-            rankSep: 70,
-            edgeSep: 50, 
+            rankSep: 100, 
+            edgeSep: 80,  
             ranker: 'network-simplex',
-            fit: true,
+            animate: true,
+            animationDuration: 1000,
         },
         boxSelectionEnabled: false,
         autounselectify: true,
@@ -262,18 +294,9 @@ function renderGraph(graphData, containerId) {
 
     cyInstances[containerId] = cy;
 
-    cy.elements().hide();
-    cy.layout({ name: 'dagre' }).run();
-    cy.nodes().forEach((node, index) => {
-        setTimeout(() => {
-            node.show();
-        }, index * 100);
-    });
-    cy.edges().forEach((edge, index) => {
-        setTimeout(() => {
-            edge.show();
-        }, (cy.nodes().length + index) * 100);
-    });
+    cy.elements().removeClass('highlighted');
+
+    cy.fit();
 
     cy.on('mouseover', 'node', (event) => {
         const node = event.target;

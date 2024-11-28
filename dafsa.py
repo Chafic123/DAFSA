@@ -1,26 +1,25 @@
 # dafsa.py
 
 class Node:
-    _id_counter = 1  # Start from 1
+    _id_counter = 1  
 
     def __init__(self, is_final=False):
         self.transitions = {}
         self.is_final = is_final
-        self.id = f'Q{Node._id_counter}'  # Assign labels like 'Q1', 'Q2', etc.
+        self.id = f'Q{Node._id_counter}' 
         Node._id_counter += 1
 
     def __eq__(self, other):
         return self.is_final == other.is_final and self.transitions == other.transitions
 
     def __hash__(self):
-        # Hash based on is_final and transitions' sorted items
         return hash((self.is_final, frozenset(self.transitions.items())))
 
 def clone_node(node, clones):
     if node in clones:
         return clones[node]
     new_node = Node(is_final=node.is_final)
-    new_node.id = node.id  # Preserve the node's label
+    new_node.id = node.id  
     clones[node] = new_node
     for char, child in node.transitions.items():
         new_node.transitions[char] = clone_node(child, clones)
@@ -28,7 +27,6 @@ def clone_node(node, clones):
 
 class DAFSA:
     def __init__(self):
-        # Removed resetting Node._id_counter to ensure unique IDs
         self.root = Node()
         self.register = {}
 
@@ -39,6 +37,34 @@ class DAFSA:
                 node.transitions[char] = Node()
             node = node.transitions[char]
         node.is_final = True
+
+    def remove(self, word):
+        """
+        Remove a word from the DAFSA.
+        Returns True if the word was successfully removed, False otherwise.
+        """
+        node = self.root
+        stack = [] 
+
+        for char in word:
+            if char in node.transitions:
+                parent = node
+                node = node.transitions[char]
+                stack.append((parent, char, node))
+            else:
+                return False
+
+        if not node.is_final:
+            return False
+
+        node.is_final = False
+
+        for parent, char, current in reversed(stack):
+            if current.is_final or current.transitions:
+                break  
+            del parent.transitions[char]
+
+        return True
 
     def minimize(self):
         self.register = {}
@@ -59,7 +85,7 @@ class DAFSA:
         nodes = []
         edges = []
         visited = set()
-        queue = [(self.root, "")]  # (node, prefix)
+        queue = [(self.root, "")]  
 
         while queue:
             current_node, prefix = queue.pop(0)
@@ -69,9 +95,9 @@ class DAFSA:
             label = prefix if current_node != self.root else "Start"
             nodes.append({
                 'data': {
-                    'id': current_node.id,  # 'Q1', 'Q2', etc.
+                    'id': current_node.id,  
                     'label': label,
-                    'is_final': 'true' if current_node.is_final else 'false'  # Send as string
+                    'is_final': 'true' if current_node.is_final else 'false'  
                 }
             })
             for char, child in current_node.transitions.items():
