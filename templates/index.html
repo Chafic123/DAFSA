@@ -10,11 +10,18 @@
     <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
 </head>
 <body class="bg-gradient-to-br from-purple-500 to-indigo-600 min-h-screen text-white">
-\    <div id="success-message" class="flash-message fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-500 ease-in-out opacity-0 pointer-events-none">
+    <div id="success-message" class="flash-message fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-500 ease-in-out opacity-0 pointer-events-none">
+        Success message here
     </div>
     <div id="error-message" class="flash-message fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-500 ease-in-out opacity-0 pointer-events-none">
+        Error message here
     </div>
 
+    <nav class="bg-transparent py-6">
+        <div class="container mx-auto px-6 md:px-12 flex items-center justify-between">
+            <h1 class="text-4xl font-bold">DAFSA Visualizer</h1>
+        </div>
+    </nav>
 
     <main class="container mx-auto px-6 md:px-12 py-12">
         <div class="text-center mb-12">
@@ -23,28 +30,52 @@
         </div>
         <div class="flex flex-col items-center mb-12">
             <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
-                <input id="wordInput" type="text" class="bg-white bg-opacity-20 border border-transparent p-3 rounded-lg w-full sm:w-64 text-white placeholder-white focus:outline-none focus:ring-4 focus:ring-pink-500 transition duration-300" placeholder="Enter a string">
-                <button onclick="addWord()" class="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-gradient-to-br focus:outline-none focus:ring-4 focus:ring-pink-500 transition-all duration-300">
+                <input id="stringInput" type="text" class="bg-white bg-opacity-20 border border-transparent p-3 rounded-lg w-full sm:w-64 text-white placeholder-white focus:outline-none focus:ring-4 focus:ring-pink-500 transition duration-300" placeholder="Enter a string">
+                <button onclick="addWord()" class="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-3 px-6 rounded-lg font-semibold hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 focus:outline-none focus:ring-4 focus:ring-pink-500 transition-all duration-300">
                     Add String
                 </button>
-                <button onclick="minimize()" class="bg-gradient-to-r from-green-400 to-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-gradient-to-br focus:outline-none focus:ring-4 focus:ring-green-500 transition-all duration-300">
+                <button onclick="minimize()" class="bg-gradient-to-r from-green-400 to-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-green-500 hover:to-green-700 focus:outline-none focus:ring-4 focus:ring-green-500 transition-all duration-300">
                     Minimize DAFSA
                 </button>
-                <button onclick="resetDafsa()" class="bg-gradient-to-r from-red-400 to-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-gradient-to-br focus:outline-none focus:ring-4 focus:ring-red-500 transition-all duration-300">
+                <button onclick="resetDafsa()" class="bg-gradient-to-r from-red-400 to-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-red-500 hover:to-red-700 focus:outline-none focus:ring-4 focus:ring-red-500 transition-all duration-300">
                     Reset DAFSA
                 </button>
             </div>
             <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                 <input id="searchInput" type="text" class="bg-white bg-opacity-20 border border-transparent p-3 rounded-lg w-full sm:w-64 text-white placeholder-white focus:outline-none focus:ring-4 focus:ring-pink-500 transition duration-300" placeholder="Search for a string">
-                <button onclick="searchWord()" class="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-gradient-to-br focus:outline-none focus:ring-4 focus:ring-yellow-500 transition-all duration-300">
+                <button onclick="searchWord()" class="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-yellow-500 hover:to-yellow-700 focus:outline-none focus:ring-4 focus:ring-yellow-500 transition-all duration-300">
                     Search
                 </button>
                 <input id="removeInput" type="text" class="bg-white bg-opacity-20 border border-transparent p-3 rounded-lg w-full sm:w-64 text-white placeholder-white focus:outline-none focus:ring-4 focus:ring-red-500 transition duration-300" placeholder="Remove a string">
-                <button onclick="removeWord()" class="bg-gradient-to-r from-red-400 to-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-gradient-to-br focus:outline-none focus:ring-4 focus:ring-red-500 transition-all duration-300">
+                <button onclick="openDeleteModal()" class="bg-gradient-to-r from-red-400 to-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-red-500 hover:to-red-700 focus:outline-none focus:ring-4 focus:ring-red-500 transition-all duration-300">
                     Remove String
                 </button>
-                <button onclick="resetLayout()" class="bg-gradient-to-r from-blue-400 to-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-gradient-to-br focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300">
+                <button onclick="resetLayout()" class="bg-gradient-to-r from-blue-400 to-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-blue-500 hover:to-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300">
                     Reset Layout
+                </button>
+            </div>
+        </div>
+        
+        <div id="delete-confirmation-modal" class="fixed inset-0 bg-purple-700 bg-opacity-75 flex items-center justify-center z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-description">
+            <div class="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-lg shadow-lg p-6 w-11/12 max-w-md mx-auto relative">
+                <h2 id="modal-title" class="text-lg font-medium text-white text-center">
+                    Confirm Deletion
+                </h2>
+                <p id="modal-description" class="mt-2 text-sm text-gray-200 text-center">
+                    Are you sure you want to remove the string "<span id="string-to-remove" class="font-semibold text-yellow-300"></span>" from the DAFSA?
+                </p>
+                <div class="mt-6 flex justify-center space-x-4">
+                    <button id="cancel-button" onclick="closeDeleteModal()" class="bg-gradient-to-r from-pink-500 to-blue-700 text-white px-4 py-2 rounded-lg font-semibold hover:from-blue-600 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-300">
+                        Cancel
+                    </button>
+                    <button id="confirm-delete-button" class="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white px-4 py-2 rounded-lg font-semibold hover:from-purple-600 hover:to-purple-800 focus:outline-none focus:ring-2 focus:purple-red-500 transition-all duration-300">
+                        Remove
+                    </button>
+                </div>
+                <button onclick="closeDeleteModal()" class="absolute top-2 right-2 text-gray-200 hover:text-white focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
                 </button>
             </div>
         </div>
@@ -68,5 +99,55 @@
     </footer>
 
     <script src="{{ url_for('static', filename='app.js') }}"></script>
+    
+    <script>
+        let stringToRemove = '';
+
+        function openDeleteModal() {
+            stringToRemove = document.getElementById('removeInput').value.trim();
+
+            if (!stringToRemove) {
+                showFlashMessage('error', "Please enter a string to remove.");
+                return;
+            }
+
+            document.getElementById('string-to-remove').textContent = stringToRemove;
+            document.getElementById('delete-confirmation-modal').classList.remove('hidden');
+
+            document.getElementById('confirm-delete-button').focus();
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('delete-confirmation-modal').classList.add('hidden');
+            stringToRemove = '';
+            document.getElementById('string-to-remove').textContent = '';
+
+            document.querySelector('button[onclick="openDeleteModal()"]').focus();
+        }
+
+        document.getElementById('confirm-delete-button').addEventListener('click', function() {
+            if (stringToRemove) {
+                this.disabled = true;
+                removeWord(stringToRemove);
+                closeDeleteModal();
+                setTimeout(() => {
+                    this.disabled = false;
+                }, 2000);
+            }
+        });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && !document.getElementById('delete-confirmation-modal').classList.contains('hidden')) {
+                closeDeleteModal();
+            }
+        });
+
+        document.getElementById('delete-confirmation-modal').addEventListener('click', function(event) {
+            const modalContent = event.target.closest('.bg-gradient-to-r');
+            if (!modalContent) {
+                closeDeleteModal();
+            }
+        });
+    </script>
 </body>
 </html>

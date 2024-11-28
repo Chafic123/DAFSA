@@ -16,6 +16,7 @@ function showFlashMessage(type, message) {
         }, 3000);
     } else if (type === 'error') {
         errorMessage.innerHTML = `
+            
             ${message}
         `;
         errorMessage.classList.remove('opacity-0', 'pointer-events-none');
@@ -43,7 +44,7 @@ function hideFlashMessage(type) {
 }
 
 function addWord() {
-    const string = document.getElementById("wordInput").value.trim();
+    const string = document.getElementById("stringInput").value.trim();
 
     if (!string) {
         showFlashMessage('error', "Please enter a string.");
@@ -61,7 +62,7 @@ function addWord() {
             showFlashMessage('error', data.error);
         } else {
             showFlashMessage('success', data.message);
-            document.getElementById("wordInput").value = "";
+            document.getElementById("stringInput").value = "";
             updateGraphs();
         }
     })
@@ -70,19 +71,7 @@ function addWord() {
     });
 }
 
-function removeWord() {
-    const string = document.getElementById("removeInput").value.trim();
-
-    if (!string) {
-        showFlashMessage('error', "Please enter a string to remove.");
-        return;
-    }
-
-    const confirmRemoval = confirm(`Are you sure you want to remove the string "${string}" from the DAFSA?`);
-    if (!confirmRemoval) {
-        return;
-    }
-
+function removeWord(string) {
     fetch("/remove_word", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -142,7 +131,7 @@ function resetLayout() {
             rankDir: "TB",
             nodeDimensionsIncludeLabels: true,
             rankSep: 100, 
-            edgeSep: 80,  
+            edgeSep: 80, 
             ranker: "network-simplex",
             animate: true,
             animationDuration: 1000,
@@ -186,7 +175,7 @@ function highlightNode(nodeId) {
         const cy = cyInstances[containerId];
         const node = cy.getElementById(nodeId);
         if (node && node.length > 0) {
-            cy.elements().removeClass('highlighted'); 
+            cy.elements().removeClass('highlighted');
             node.addClass('highlighted');
             cy.animate({
                 center: { eles: node },
@@ -236,23 +225,23 @@ function renderGraph(graphData, containerId) {
                 selector: 'node',
                 style: {
                     label: 'data(label)',
-                    'background-color': '#8B5CF6',
-                    width: '50px',
-                    height: '50px',
+                    'background-color': '#8B5CF6', 
+                    width: '60px', 
+                    height: '60px', 
                     'text-valign': 'center',
                     'text-halign': 'center',
                     color: '#fff',
-                    'font-size': '14px',
+                    'font-size': '16px',
                     'border-width': 2,
-                    'border-color': '#C4B5FD',
+                    'border-color': '#C4B5FD', 
                     shape: 'ellipse',
                 },
             },
             {
                 selector: 'node[is_final = "true"]',
                 style: {
-                    'background-color': '#EC4899',
-                    'border-color': '#F472B6',
+                    'background-color': '#EC4899', 
+                    'border-color': '#F472B6', 
                     'border-width': 4,
                 },
             },
@@ -262,17 +251,17 @@ function renderGraph(graphData, containerId) {
                     label: 'data(label)',
                     'curve-style': 'bezier',
                     'target-arrow-shape': 'triangle',
-                    'target-arrow-color': '#D1D5DB',
-                    'line-color': '#D1D5DB',
-                    width: 3,
-                    'font-size': '12px',
-                    color: '#E5E7EB',
+                    'target-arrow-color': '#D1D5DB', 
+                    'line-color': '#D1D5DB', 
+                    width: 4, 
+                    'font-size': '14px', 
+                    color: '#E5E7EB', 
                 },
             },
             {
                 selector: '.highlighted',
                 style: {
-                    'background-color': '#FF0000',
+                    'background-color': '#FF0000', 
                     'border-color': '#FF0000',
                     'border-width': 6,
                 },
@@ -301,8 +290,8 @@ function renderGraph(graphData, containerId) {
     cy.on('mouseover', 'node', (event) => {
         const node = event.target;
         node.style({
-            'background-color': '#7C3AED',
-            'border-color': '#A78BFA',
+            'background-color': '#7C3AED', 
+            'border-color': '#A78BFA', 
         });
     });
 
