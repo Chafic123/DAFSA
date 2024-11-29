@@ -1,153 +1,250 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DAFSA Visualization</title>
-    <link href="{{ url_for('static', filename='output.css') }}" rel="stylesheet">
+    <link
+      href="{{ url_for('static', filename='output.css') }}"
+      rel="stylesheet"
+    />
     <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
     <script src="https://unpkg.com/dagre@0.8.5/dist/dagre.min.js"></script>
     <script src="https://unpkg.com/cytoscape-dagre@2.3.0/cytoscape-dagre.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
-</head>
-<body class="bg-gradient-to-br from-purple-500 to-indigo-600 min-h-screen text-white">
-    <div id="success-message" class="flash-message fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-500 ease-in-out opacity-0 pointer-events-none">
-        Success message here
-    </div>
-    <div id="error-message" class="flash-message fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-500 ease-in-out opacity-0 pointer-events-none">
-        Error message here
-    </div>
+  </head>
+  <body class="bg-gradient-to-br from-purple-500 to-indigo-600 min-h-screen text-white flex flex-col">
 
-    <nav class="bg-transparent py-6">
-        <div class="container mx-auto px-6 md:px-12 flex items-center justify-between">
-            <h1 class="text-4xl font-bold">DAFSA Visualizer</h1>
-        </div>
+    <div id="success-message" class="flash-message fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-500 ease-in-out opacity-0 pointer-events-none sm:w-11/12 md:w-auto">
+      Success message here
+    </div>
+    
+    <div id="error-message"
+      class="flash-message fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-500 ease-in-out opacity-0 pointer-events-none sm:w-11/12 md:w-auto">
+      Error message here
+    </div>
+      <nav class="bg-transparent py-4">
+      <div class="container mx-auto px-4 md:px-12 flex items-center justify-between">
+        <h1 class="text-3xl md:text-4xl font-bold">DAFSA Visualizer</h1>
+        <button class="md:hidden text-white focus:outline-none">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" 
+               viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" 
+                  stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
     </nav>
-
-    <main class="container mx-auto px-6 md:px-12 py-12">
-        <div class="text-center mb-12">
-            <h2 class="text-5xl font-bold mb-4 animate-fade-in">Dynamic and Minimizable DAFSA</h2>
-            <p class="text-xl">Add strings, minimize your DAFSA, and visualize the differences in real-time.</p>
+  
+    <main class="flex-grow container mx-auto px-4 md:px-12 py-8 md:py-12">
+      <div class="text-center mb-8 md:mb-12">
+        <h2 class="text-3xl md:text-5xl font-bold mb-4 animate-fade-in">
+          Dynamic and Minimizable DAFSA
+        </h2>
+        <p class="text-lg md:text-xl">
+          Add strings, minimize your DAFSA, and visualize the differences in real-time.
+        </p>
+      </div>
+  
+      <div class="flex flex-col items-center mb-8 md:mb-12 space-y-8 md:space-y-12 w-full">
+        <div class="flex flex-col sm:flex-row flex-wrap items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4 w-full">
+          <input
+            id="stringInput"
+            type="text"
+            class="bg-white bg-opacity-20 border border-transparent p-3 rounded-lg w-full sm:w-64 text-white placeholder-white focus:outline-none focus:ring-4 focus:ring-pink-500 transition duration-300"
+            placeholder="Enter a string" />
+          <button
+            onclick="addWord()"
+            class="w-full sm:w-auto bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-3 px-6 rounded-lg font-semibold hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 focus:outline-none focus:ring-4 focus:ring-pink-500 transition-all duration-300">
+            Add String
+          </button>
+          <button
+            onclick="minimize()"
+            class="w-full sm:w-auto bg-gradient-to-r from-green-400 to-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-green-500 hover:to-green-700 focus:outline-none focus:ring-4 focus:ring-green-500 transition-all duration-300" >
+            Minimize DAFSA
+          </button>
+          <button
+            onclick="resetDafsa()"
+            class="w-full sm:w-auto bg-gradient-to-r from-red-400 to-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-red-500 hover:to-red-700 focus:outline-none focus:ring-4 focus:ring-red-500 transition-all duration-300">
+            Reset DAFSA
+          </button>
         </div>
-        <div class="flex flex-col items-center mb-12">
-            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
-                <input id="stringInput" type="text" class="bg-white bg-opacity-20 border border-transparent p-3 rounded-lg w-full sm:w-64 text-white placeholder-white focus:outline-none focus:ring-4 focus:ring-pink-500 transition duration-300" placeholder="Enter a string">
-                <button onclick="addWord()" class="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-3 px-6 rounded-lg font-semibold hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 focus:outline-none focus:ring-4 focus:ring-pink-500 transition-all duration-300">
-                    Add String
-                </button>
-                <button onclick="minimize()" class="bg-gradient-to-r from-green-400 to-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-green-500 hover:to-green-700 focus:outline-none focus:ring-4 focus:ring-green-500 transition-all duration-300">
-                    Minimize DAFSA
-                </button>
-                <button onclick="resetDafsa()" class="bg-gradient-to-r from-red-400 to-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-red-500 hover:to-red-700 focus:outline-none focus:ring-4 focus:ring-red-500 transition-all duration-300">
-                    Reset DAFSA
-                </button>
-            </div>
-            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                <input id="searchInput" type="text" class="bg-white bg-opacity-20 border border-transparent p-3 rounded-lg w-full sm:w-64 text-white placeholder-white focus:outline-none focus:ring-4 focus:ring-pink-500 transition duration-300" placeholder="Search for a string">
-                <button onclick="searchWord()" class="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-yellow-500 hover:to-yellow-700 focus:outline-none focus:ring-4 focus:ring-yellow-500 transition-all duration-300">
-                    Search
-                </button>
-                <input id="removeInput" type="text" class="bg-white bg-opacity-20 border border-transparent p-3 rounded-lg w-full sm:w-64 text-white placeholder-white focus:outline-none focus:ring-4 focus:ring-red-500 transition duration-300" placeholder="Remove a string">
-                <button onclick="openDeleteModal()" class="bg-gradient-to-r from-red-400 to-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-red-500 hover:to-red-700 focus:outline-none focus:ring-4 focus:ring-red-500 transition-all duration-300">
-                    Remove String
-                </button>
-                <button onclick="resetLayout()" class="bg-gradient-to-r from-blue-400 to-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-blue-500 hover:to-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300">
-                    Reset Layout
-                </button>
-            </div>
+  
+        <div class="flex flex-col sm:flex-row flex-wrap items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4 w-full">
+          <input
+            id="searchInput"
+            type="text"
+            class="bg-white bg-opacity-20 border border-transparent p-3 rounded-lg w-full sm:w-64 text-white placeholder-white focus:outline-none focus:ring-4 focus:ring-pink-500 transition duration-300"
+            placeholder="Search for a string"/>
+          <button
+            onclick="searchWord()"
+            class="w-full sm:w-auto bg-gradient-to-r from-yellow-400 to-yellow-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-yellow-500 hover:to-yellow-700 focus:outline-none focus:ring-4 focus:ring-yellow-500 transition-all duration-300">
+            Search
+          </button>
+          <input
+            id="removeInput"
+            type="text"
+            class="bg-white bg-opacity-20 border border-transparent p-3 rounded-lg w-full sm:w-64 text-white placeholder-white focus:outline-none focus:ring-4 focus:ring-red-500 transition duration-300"
+            placeholder="Remove a string"/>
+          <button
+            onclick="openDeleteModal()"
+            class="w-full sm:w-auto bg-gradient-to-r from-red-400 to-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-red-500 hover:to-red-700 focus:outline-none focus:ring-4 focus:ring-red-500 transition-all duration-300">
+            Remove String
+          </button>
+          <button
+            onclick="resetLayout()"
+            class="w-full sm:w-auto bg-gradient-to-r from-blue-400 to-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-blue-500 hover:to-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300">
+            Reset Layout
+          </button>
         </div>
-        
-        <div id="delete-confirmation-modal" class="fixed inset-0 bg-purple-700 bg-opacity-75 flex items-center justify-center z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-description">
-            <div class="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-lg shadow-lg p-6 w-11/12 max-w-md mx-auto relative">
-                <h2 id="modal-title" class="text-lg font-medium text-white text-center">
-                    Confirm Deletion
-                </h2>
-                <p id="modal-description" class="mt-2 text-sm text-gray-200 text-center">
-                    Are you sure you want to remove the string "<span id="string-to-remove" class="font-semibold text-yellow-300"></span>" from the DAFSA?
-                </p>
-                <div class="mt-6 flex justify-center space-x-4">
-                    <button id="cancel-button" onclick="closeDeleteModal()" class="bg-gradient-to-r from-pink-500 to-blue-700 text-white px-4 py-2 rounded-lg font-semibold hover:from-blue-600 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-300">
-                        Cancel
-                    </button>
-                    <button id="confirm-delete-button" class="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white px-4 py-2 rounded-lg font-semibold hover:from-purple-600 hover:to-purple-800 focus:outline-none focus:ring-2 focus:purple-red-500 transition-all duration-300">
-                        Remove
-                    </button>
-                </div>
-                <button onclick="closeDeleteModal()" class="absolute top-2 right-2 text-gray-200 hover:text-white focus:outline-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-            </div>
+      </div>
+  
+      <div
+        id="delete-confirmation-modal"
+        class="fixed inset-0 bg-purple-700 bg-opacity-75 flex items-center justify-center z-50 hidden p-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description">
+        <div class="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-lg shadow-lg p-6 w-full max-w-md mx-auto relative">
+          <h2 id="modal-title" class="text-lg font-medium text-white text-center">Confirm Deletion</h2>
+          <p id="modal-description" class="mt-2 text-sm text-gray-200 text-center">
+            Are you sure you want to remove the string "<span id="string-to-remove" class="font-semibold text-yellow-300"></span>" from the DAFSA?
+          </p>
+          <div class="mt-6 flex justify-center space-x-4">
+            <button
+              id="cancel-button"
+              onclick="closeDeleteModal()"
+              class="bg-gradient-to-r from-pink-500 to-blue-700 text-white px-4 py-2 rounded-lg font-semibold hover:from-blue-600 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-300"
+            >
+              Cancel
+            </button>
+            <button
+              id="confirm-delete-button"
+              class="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white px-4 py-2 rounded-lg font-semibold hover:from-purple-600 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-300"
+            >
+              Remove
+            </button>
+          </div>
+          <button
+            onclick="closeDeleteModal()"
+            class="absolute top-2 right-2 text-gray-200 hover:text-white focus:outline-none"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                 viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div class="flex flex-col h-[600px] bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg p-4 shadow-2xl">
-                <h2 class="text-2xl font-semibold text-center mb-4">Original DAFSA</h2>
-                <div id="originalGraph" class="flex-grow"></div>
+      </div>
+  
+      <div class="flex flex-col md:flex-row gap-8 md:gap-12">
+        <div class="flex flex-col h-auto md:h-[600px] flex-1 bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg p-4 shadow-2xl">
+          <h2 class="text-xl md:text-2xl font-semibold text-center mb-4">Original DAFSA</h2>
+          <div class="flex justify-center mb-4 flex-wrap">
+            <div class="flex items-center mr-6 mb-2 md:mb-0 bg-white bg-opacity-20 p-2 rounded-lg border border-purple-600">
+              <span class="inline-block w-4 h-4 bg-purple-600 rounded-full mr-2"></span>
+              <span class="text-sm">Non-Final State</span>
             </div>
-            <div class="flex flex-col h-[600px] bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg p-4 shadow-2xl">
-                <h2 class="text-2xl font-semibold text-center mb-4">Minimized DAFSA</h2>
-                <div id="minimizedGraph" class="flex-grow"></div>
+            <div class="flex items-center bg-white bg-opacity-20 p-2 rounded-lg border border-pink-500">
+              <span class="inline-block w-4 h-4 bg-pink-500 rounded-full mr-2"></span>
+              <span class="text-sm">Accepted (Final) State</span>
             </div>
+          </div>
+          <div id="originalGraph" class="flex-grow overflow-auto"></div>
         </div>
+        <div class="flex flex-col h-auto md:h-[600px] flex-1 bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg p-4 shadow-2xl">
+          <h2 class="text-xl md:text-2xl font-semibold text-center mb-4">Minimized DAFSA</h2>
+          <div class="flex justify-center mb-4 flex-wrap">
+            <div class="flex items-center mr-6 mb-2 md:mb-0 bg-white bg-opacity-20 p-2 rounded-lg border border-purple-600">
+              <span class="inline-block w-4 h-4 bg-purple-600 rounded-full mr-2"></span>
+              <span class="text-sm">Non-Final State</span>
+            </div>
+            <div class="flex items-center bg-white bg-opacity-20 p-2 rounded-lg border border-pink-500">
+              <span class="inline-block w-4 h-4 bg-pink-500 rounded-full mr-2"></span>
+              <span class="text-sm">Accepted (Final) State</span>
+            </div>
+          </div>
+          <div id="minimizedGraph" class="flex-grow overflow-auto"></div>
+        </div>
+      </div>
     </main>
-
+  
     <footer class="mt-12 py-6 bg-transparent">
-        <div class="container mx-auto text-center">
-            <p class="text-gray-200">&copy; Best DAFSA Visualizer. All rights reserved. Don't copy us.</p>
-        </div>
+      <div class="container mx-auto text-center">
+        <p class="text-gray-200 text-sm md:text-base">
+          &copy; 2024 Best DAFSA Visualizer. All rights reserved. Don't copy us.
+        </p>
+      </div>
     </footer>
+  </body>
+</html>
 
     <script src="{{ url_for('static', filename='app.js') }}"></script>
-    
+
     <script>
-        let stringToRemove = '';
+      let stringToRemove = "";
 
-        function openDeleteModal() {
-            stringToRemove = document.getElementById('removeInput').value.trim();
+      function openDeleteModal() {
+        stringToRemove = document.getElementById("removeInput").value.trim();
 
-            if (!stringToRemove) {
-                showFlashMessage('error', "Please enter a string to remove.");
-                return;
-            }
-
-            document.getElementById('string-to-remove').textContent = stringToRemove;
-            document.getElementById('delete-confirmation-modal').classList.remove('hidden');
-
-            document.getElementById('confirm-delete-button').focus();
+        if (!stringToRemove) {
+          showFlashMessage("error", "Please enter a string to remove.");
+          return;
         }
 
-        function closeDeleteModal() {
-            document.getElementById('delete-confirmation-modal').classList.add('hidden');
-            stringToRemove = '';
-            document.getElementById('string-to-remove').textContent = '';
+        document.getElementById("string-to-remove").textContent =
+          stringToRemove;
+        document
+          .getElementById("delete-confirmation-modal")
+          .classList.remove("hidden");
 
-            document.querySelector('button[onclick="openDeleteModal()"]').focus();
+        document.getElementById("confirm-delete-button").focus();
+      }
+
+      function closeDeleteModal() {
+        document
+          .getElementById("delete-confirmation-modal")
+          .classList.add("hidden");
+        stringToRemove = "";
+        document.getElementById("string-to-remove").textContent = "";
+
+        document.querySelector('button[onclick="openDeleteModal()"]').focus();
+      }
+
+      document
+        .getElementById("confirm-delete-button")
+        .addEventListener("click", function () {
+          if (stringToRemove) {
+            this.disabled = true;
+            removeWord(stringToRemove);
+            closeDeleteModal();
+            setTimeout(() => {
+              this.disabled = false;
+            }, 2000);
+          }
+        });
+
+      document.addEventListener("keydown", function (event) {
+        if (
+          event.key === "Escape" &&
+          !document
+            .getElementById("delete-confirmation-modal")
+            .classList.contains("hidden")
+        ) {
+          closeDeleteModal();
         }
+      });
 
-        document.getElementById('confirm-delete-button').addEventListener('click', function() {
-            if (stringToRemove) {
-                this.disabled = true;
-                removeWord(stringToRemove);
-                closeDeleteModal();
-                setTimeout(() => {
-                    this.disabled = false;
-                }, 2000);
-            }
-        });
-
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape' && !document.getElementById('delete-confirmation-modal').classList.contains('hidden')) {
-                closeDeleteModal();
-            }
-        });
-
-        document.getElementById('delete-confirmation-modal').addEventListener('click', function(event) {
-            const modalContent = event.target.closest('.bg-gradient-to-r');
-            if (!modalContent) {
-                closeDeleteModal();
-            }
+      document
+        .getElementById("delete-confirmation-modal")
+        .addEventListener("click", function (event) {
+          const modalContent = event.target.closest(".bg-gradient-to-r");
+          if (!modalContent) {
+            closeDeleteModal();
+          }
         });
     </script>
-</body>
+  </body>
 </html>

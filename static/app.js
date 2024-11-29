@@ -1,8 +1,8 @@
 let cyInstances = {};
 
 function showFlashMessage(type, message) {
-    const successMessage = document.getElementById('success-message');
-    const errorMessage = document.getElementById('error-message');
+    let successMessage = document.getElementById('success-message');
+    let errorMessage = document.getElementById('error-message');
 
     if (type === 'success') {
         successMessage.innerHTML = `
@@ -29,8 +29,8 @@ function showFlashMessage(type, message) {
 }
 
 function hideFlashMessage(type) {
-    const successMessage = document.getElementById('success-message');
-    const errorMessage = document.getElementById('error-message');
+    let successMessage = document.getElementById('success-message');
+    let errorMessage = document.getElementById('error-message');
 
     if (type === 'success') {
         successMessage.classList.remove('opacity-100');
@@ -44,7 +44,7 @@ function hideFlashMessage(type) {
 }
 
 function addWord() {
-    const string = document.getElementById("stringInput").value.trim();
+    let string = document.getElementById("stringInput").value.trim();
 
     if (!string) {
         showFlashMessage('error', "Please enter a string.");
@@ -124,8 +124,8 @@ function resetDafsa() {
 function resetLayout() {
     showFlashMessage('success', "Layout has been reset.");
 
-    for (const containerId in cyInstances) {
-        const cy = cyInstances[containerId];
+    for (let containerId in cyInstances) {
+        let cy = cyInstances[containerId];
         cy.layout({
             name: "dagre",
             rankDir: "TB",
@@ -140,7 +140,7 @@ function resetLayout() {
 }
 
 function searchWord() {
-    const string = document.getElementById("searchInput").value.trim();
+    let string = document.getElementById("searchInput").value.trim();
 
     if (!string) {
         showFlashMessage('error', "Please enter a string to search.");
@@ -171,9 +171,9 @@ function searchWord() {
 function highlightNode(nodeId) {
     let found = false;
 
-    for (const containerId in cyInstances) {
-        const cy = cyInstances[containerId];
-        const node = cy.getElementById(nodeId);
+    for (let containerId in cyInstances) {
+        let cy = cyInstances[containerId];
+        let node = cy.getElementById(nodeId);
         if (node && node.length > 0) {
             cy.elements().removeClass('highlighted');
             node.addClass('highlighted');
@@ -211,13 +211,13 @@ function updateGraphs() {
 }
 
 function renderGraph(graphData, containerId) {
-    const elements = graphData.nodes.concat(graphData.edges);
+    let elements = graphData.nodes.concat(graphData.edges);
 
     if (cyInstances[containerId]) {
         cyInstances[containerId].destroy();
     }
 
-    const cy = cytoscape({
+    let cy = cytoscape({
         container: document.getElementById(containerId),
         elements: elements,
         style: [
@@ -288,7 +288,7 @@ function renderGraph(graphData, containerId) {
     cy.fit();
 
     cy.on('mouseover', 'node', (event) => {
-        const node = event.target;
+        let node = event.target;
         node.style({
             'background-color': '#7C3AED', 
             'border-color': '#A78BFA', 
@@ -296,7 +296,7 @@ function renderGraph(graphData, containerId) {
     });
 
     cy.on('mouseout', 'node', (event) => {
-        const node = event.target;
+        let node = event.target;
         node.style({
             'background-color': node.data('is_final') === "true" ? '#EC4899' : '#8B5CF6',
             'border-color': node.data('is_final') === "true" ? '#F472B6' : '#C4B5FD',
@@ -304,7 +304,7 @@ function renderGraph(graphData, containerId) {
     });
 
     cy.on('mouseover', 'edge', (event) => {
-        const edge = event.target;
+        let edge = event.target;
         edge.style({
             'line-color': '#A78BFA',
             'target-arrow-color': '#A78BFA',
@@ -312,7 +312,7 @@ function renderGraph(graphData, containerId) {
     });
 
     cy.on('mouseout', 'edge', (event) => {
-        const edge = event.target;
+        let edge = event.target;
         edge.style({
             'line-color': '#D1D5DB',
             'target-arrow-color': '#D1D5DB',
